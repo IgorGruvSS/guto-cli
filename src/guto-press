@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ "$#" -eq 0 ]; then
+    echo "❌ Uso: summarize [arquivo.txt]"
+    exit 1
+fi
+FILE_TXT="$1"
+FILE_MD="${FILE_TXT%.txt}.md"
+echo "🧠 Gerando sumário executivo via Gemini..."
+# Usando o comando gemini para processar o texto
+gemini ask "Aja como um assistente de reuniões sênior. Baseado no texto abaixo, gere um sumário em Markdown (Resumo, Pontos Chave, Decisões e Próximos Passos). Transcrição: $(cat "$FILE_TXT")" > "$FILE_MD"
+echo "✅ Sumário salvo em: $(basename "$FILE_MD")"

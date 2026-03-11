@@ -1,0 +1,55 @@
+#!/bin/bash
+MEETING_DIR="$HOME/Meetings"
+PID_FILE="/tmp/meeting_recorder.pid"
+FILE_LOG="/tmp/current_meeting_file"
+
+HEADSET_OUT="alsa_output.usb-Logitech_G733_Gaming_Headset_0000000000000000-00.analog-stereo.monitor"
+HEADSET_MIC="alsa_input.usb-Logitech_G733_Gaming_Headset_0000000000000000-00.mono-fallback"
+
+mkdir -p "$MEETING_DIR"
+
+case "$1" in
+    start)
+        if [ -f "$PID_FILE" ]; then
+            echo "⚠️ Já existe uma gravação em andamento."
+            exit 1
+        fi
+        DATE_NOW=$(date +'%Y-%m-%d')
+        TIME_NOW=$(date +'%H-%M-%S')
+        FILENAME="$MEETING_DIR/meeting_${DATE_NOW}_${TIME_NOW}_mixed.wav"
+        nohup ffmpeg -hide_banner -loglevel error -f pulse -i "$HEADSET_OUT" -f pulse -i "$HEADSET_MIC" -filter_complex amix=inputs=2:duration=first -ac 1 -ar 16000 "$FILENAME" > /dev/null 2>&1 &
+        echo $! > "$PID_FILE"
+        echo "$FILENAME" > "$FILE_LOG"
+        echo "✅ Gravação iniciada."
+        ;;
+    stop)
+        if [ ! -f "$PID_FILE" ]; then echo "❌ Nenhuma gravação."; exit 1; fi
+        PID=$(cat "$PID_FILE"); OLD_PATH=$(cat "$FILE_LOG"); DATE_STR=$(date +'%Y-%m-%d')
+        kill -2 "$PID" 2>/dev/null; rm "$PID_FILE" "$FILE_LOG"
+        echo "🛑 Gravação finalizada."
+        echo -n "📝 Nome da reunião (AAAA-MM-DD-nome): "
+        read NAME
+        if [ -n "$NAME" ]; then
+            CLEAN_NAME=$(echo "$NAME" | tr ' ' '-' | tr -cd '[:alnum:]-')
+            FINAL_PATH="$MEETING_DIR/${DATE_STR}-${CLEAN_NAME}.wav"
+            mv "$OLD_PATH" "$FINAL_PATH"
+        else
+            FINAL_PATH="$OLD_PATH"
+        fi
+        echo "📂 Arquivo: $(basename "$FINAL_PATH")"
+        
+        echo -n "💡 Transcrever agora? (s/n): "
+        read START_TRANS
+        if [[ "$START_TRANS" == "s" || "$START_TRANS" == "S" ]]; then
+            transcript "$FINAL_PATH"
+            TXT_PATH="${FINAL_PATH%.wav}.txt"
+            
+            echo -n "🤖 Gerar sumário Markdown com Gemini? (s/n): "
+            read START_SUM
+            if [[ "$START_SUM" == "s" || "$START_SUM" == "S" ]]; then
+                summarize "$TXT_PATH"
+            fi
+        fi
+        ;;
+    *) echo "Uso: record [start|stop]" ;;
+esac

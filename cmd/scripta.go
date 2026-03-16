@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/igorsousasilva/guto/internal/adapters/audio"
-	"github.com/igorsousasilva/guto/internal/adapters/press"
-	"github.com/igorsousasilva/guto/internal/adapters/scribe"
+	"github.com/IgorGruvSS/guto/internal/adapters/audio"
+	"github.com/IgorGruvSS/guto/internal/adapters/press"
+	"github.com/IgorGruvSS/guto/internal/adapters/scribe"
 	"github.com/spf13/cobra"
 )
 

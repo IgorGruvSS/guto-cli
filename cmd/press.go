@@ -6,7 +6,7 @@ import (
     "path/filepath"
     "strings"
     "github.com/spf13/cobra"
-    "github.com/igorsousasilva/guto/internal/adapters/press"
+    "github.com/IgorGruvSS/guto/internal/adapters/press"
 )
 
 var pressCmd = &cobra.Command{

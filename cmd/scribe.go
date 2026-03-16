@@ -5,7 +5,7 @@ import (
     "os"
     "path/filepath"
     "github.com/spf13/cobra"
-    "github.com/igorsousasilva/guto/internal/adapters/scribe"
+    "github.com/IgorGruvSS/guto/internal/adapters/scribe"
 )
 
 var scribeCmd = &cobra.Command{

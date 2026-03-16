@@ -1,5 +1,5 @@
 package main
-import "github.com/igorsousasilva/guto/cmd"
+import "github.com/IgorGruvSS/guto/cmd"
 func main() {
     cmd.Execute()
 }

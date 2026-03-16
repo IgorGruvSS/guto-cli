@@ -6,7 +6,7 @@ import (
     "path/filepath"
     "time"
     "github.com/spf13/cobra"
-    "github.com/igorsousasilva/guto/internal/adapters/audio"
+    "github.com/IgorGruvSS/guto/internal/adapters/audio"
 )
 
 var listenCmd = &cobra.Command{

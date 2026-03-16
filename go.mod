@@ -1,4 +1,4 @@
-module github.com/igorsousasilva/guto
+module github.com/IgorGruvSS/guto
 
 go 1.25.6
 

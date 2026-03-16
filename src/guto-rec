@@ -1,5 +1,5 @@
 #!/bin/bash
-MEETING_DIR="$HOME/Meetings"
+MEETING_DIR="Output/audio"
 PID_FILE="/tmp/meeting_recorder.pid"
 FILE_LOG="/tmp/current_meeting_file"
 
@@ -42,6 +42,8 @@ case "$1" in
         read START_TRANS
         if [[ "$START_TRANS" == "s" || "$START_TRANS" == "S" ]]; then
             transcript "$FINAL_PATH"
+            # Output/scribe logic should be handled by transcript script or manually
+            # For now, let's just match the Go implementation's target
             TXT_PATH="${FINAL_PATH%.wav}.txt"
             
             echo -n "🤖 Gerar sumário Markdown com Gemini? (s/n): "

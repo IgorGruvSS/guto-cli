@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"sort"
+	"strings"
 
+	"github.com/IgorGruvSS/guto/internal/adapters/press"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -50,18 +52,36 @@ var configSetCmd = &cobra.Command{
 		viper.Set(key, value)
 		err := viper.WriteConfig()
 		if err != nil {
-			// Tenta criar se não existir (SafeWriteConfig seria melhor, mas WriteConfig cria se o arquivo existir)
-			// Se falhar porque não existe, usamos SafeWriteConfigAs ou WriteConfigAs
 			err = viper.SafeWriteConfig()
 			if err != nil {
-                 // Se ja existe, ele reclama, entao eh so write mesmo
-                 if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-                     fmt.Printf("Erro ao salvar configuração: %v\n", err)
-                     return
-                 }
+				if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+					fmt.Printf("Erro ao salvar configuração: %v\n", err)
+					return
+				}
 			}
 		}
 		fmt.Printf("Configuração atualizada: %s = %s\n", key, value)
+	},
+}
+
+var configModelsCmd = &cobra.Command{
+	Use:   "models",
+	Short: "Lista os modelos de IA disponíveis",
+	Run: func(cmd *cobra.Command, args []string) {
+		// Por enquanto fixo no Gemini, futuramente pode ser por provider
+		adapter := &press.GeminiAdapter{}
+		models, err := adapter.ListModels()
+		if err != nil {
+			fmt.Printf("Erro ao listar modelos: %v\n", err)
+			return
+		}
+
+		fmt.Println("Modelos Gemini disponíveis (use guto config set press.model <nome>):")
+		for _, m := range models {
+			// Remove o prefixo "models/" para ficar mais limpo
+			name := strings.TrimPrefix(m, "models/")
+			fmt.Printf("- %s\n", name)
+		}
 	},
 }
 
@@ -69,4 +89,5 @@ func init() {
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configGetCmd)
 	configCmd.AddCommand(configSetCmd)
+	configCmd.AddCommand(configModelsCmd)
 }

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/guto-gemini.png" width="880" alt="Guto Logo">
+  <img src="assets/guto-main.png" width="880" alt="Guto Logo">
 </p>
 
 <p align="center">

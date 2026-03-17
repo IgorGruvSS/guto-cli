@@ -65,46 +65,59 @@ var scriptaCmd = &cobra.Command{
 
 		if confirmScribe == "s" || confirmScribe == "S" {
 			s := &scribe.WhisperAdapter{}
-			txtPath, err := s.Transcribe(finalPath) // This creates .txt in the same dir as audio
+			txtPath, err := s.Transcribe(finalPath)
 			if err != nil {
 				fmt.Printf("❌ Erro no Scribe: %v\n", err)
-			} else {
-				// Move .txt to Output/scribe
-				newTxtPath := filepath.Join(scribeDir, filepath.Base(txtPath))
-				if err := os.Rename(txtPath, newTxtPath); err == nil {
-					txtPath = newTxtPath
-				}
-				fmt.Printf("✅ Scripta transcrito: %s\n", txtPath)
-
-				// CLEANUP
-				fmt.Print("🗑️  Deseja descartar a matriz de áudio (.wav)? (s/n): ")
-				var confirmClean string
-				fmt.Scanln(&confirmClean)
-				if confirmClean == "s" || confirmClean == "S" {
-					os.Remove(finalPath)
-					fmt.Println("✅ Matriz descartada. Espaço recuperado.")
-				}
-
-				// --- FASE 4: PRESS (PRENSAR) ---
-				fmt.Print("🤖 Guto Press: Gerar sumário executivo em Markdown? (s/n): ")
-				var confirmPress string
-				fmt.Scanln(&confirmPress)
-				if confirmPress == "s" || confirmPress == "S" {
-					content, _ := os.ReadFile(txtPath)
-					p := &press.GeminiAdapter{}
-					summary, err := p.Summarize(string(content))
-					if err != nil {
-						fmt.Printf("❌ Erro no Press: %v\n", err)
-					} else {
-						mdName := strings.TrimSuffix(filepath.Base(txtPath), ".txt") + ".md"
-						mdPath := filepath.Join(pressDir, mdName)
-						os.WriteFile(mdPath, []byte(summary), 0644)
-						fmt.Printf("✅ Essência prensada em: %s\n", mdPath)
-					}
-				}
+				fmt.Println("⚠️  Fluxo interrompido devido a erro na transcrição.")
+				return
 			}
+			
+			// Move .txt to Output/scribe
+			newTxtPath := filepath.Join(scribeDir, filepath.Base(txtPath))
+			if err := os.Rename(txtPath, newTxtPath); err == nil {
+				txtPath = newTxtPath
+			}
+			fmt.Printf("✅ Scripta transcrito: %s\n", txtPath)
+
+			// CLEANUP
+			fmt.Print("🗑️  Deseja descartar a matriz de áudio (.wav)? (s/n): ")
+			var confirmClean string
+			fmt.Scanln(&confirmClean)
+			if confirmClean == "s" || confirmClean == "S" {
+				os.Remove(finalPath)
+				fmt.Println("✅ Matriz descartada. Espaço recuperado.")
+			}
+
+			// --- FASE 4: PRESS (PRENSAR) ---
+			fmt.Print("🤖 Guto Press: Gerar sumário executivo em Markdown? (s/n): ")
+			var confirmPress string
+			fmt.Scanln(&confirmPress)
+			if confirmPress == "s" || confirmPress == "S" {
+				content, err := os.ReadFile(txtPath)
+				if err != nil {
+					fmt.Printf("❌ Erro ao ler transcrição: %v\n", err)
+					return
+				}
+				p := &press.GeminiAdapter{}
+				summary, err := p.Summarize(string(content))
+				if err != nil {
+					fmt.Printf("❌ Erro no Press: %v\n", err)
+					return
+				}
+				
+				mdName := strings.TrimSuffix(filepath.Base(txtPath), ".txt") + ".md"
+				mdPath := filepath.Join(pressDir, mdName)
+				err = os.WriteFile(mdPath, []byte(summary), 0644)
+				if err != nil {
+					fmt.Printf("❌ Erro ao salvar sumário: %v\n", err)
+					return
+				}
+				fmt.Printf("✅ Essência prensada em: %s\n", mdPath)
+			}
+		} else {
+			fmt.Println("ℹ️  Transcrição pulada pelo usuário.")
 		}
-		fmt.Println("🏛️  Scripta concluído. Verba volant, scripta manent.")
+		fmt.Println("🏛️  Scripta concluído com sucesso. Verba volant, scripta manent.")
 	},
 }
 

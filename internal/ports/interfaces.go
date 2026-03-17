@@ -11,4 +11,5 @@ type Scribe interface {
 
 type Press interface {
     Summarize(text string) (string, error)
+    ListModels() ([]string, error)
 }

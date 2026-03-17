@@ -12,13 +12,13 @@ import (
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Gerencia as configurações do Guto",
-	Long:  `Permite visualizar e editar as configurações armazenadas em ~/.config/guto/config.yaml`,
+	Short: "Manage Guto settings",
+	Long:  `Allows viewing and editing the settings stored in ~/.config/guto/config.yaml`,
 }
 
 var configGetCmd = &cobra.Command{
 	Use:   "get [key]",
-	Short: "Exibe o valor de uma configuração ou todas se a chave for omitida",
+	Short: "Display a setting value or all if the key is omitted",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			settings := viper.AllSettings()
@@ -35,7 +35,7 @@ var configGetCmd = &cobra.Command{
 		key := args[0]
 		val := viper.Get(key)
 		if val == nil {
-			fmt.Printf("Configuração '%s' não encontrada.\n", key)
+			fmt.Printf("Setting '%s' not found.\n", key)
 		} else {
 			fmt.Printf("%s: %v\n", key, val)
 		}
@@ -44,7 +44,7 @@ var configGetCmd = &cobra.Command{
 
 var configSetCmd = &cobra.Command{
 	Use:   "set [key] [value]",
-	Short: "Define o valor de uma configuração",
+	Short: "Define a setting value",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
@@ -55,30 +55,30 @@ var configSetCmd = &cobra.Command{
 			err = viper.SafeWriteConfig()
 			if err != nil {
 				if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-					fmt.Printf("Erro ao salvar configuração: %v\n", err)
+					fmt.Printf("Error saving setting: %v\n", err)
 					return
 				}
 			}
 		}
-		fmt.Printf("Configuração atualizada: %s = %s\n", key, value)
+		fmt.Printf("Setting updated: %s = %s\n", key, value)
 	},
 }
 
 var configModelsCmd = &cobra.Command{
 	Use:   "models",
-	Short: "Lista os modelos de IA disponíveis",
+	Short: "List available AI models",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Por enquanto fixo no Gemini, futuramente pode ser por provider
+		// Currently fixed to Gemini, could be provider-specific in the future
 		adapter := &press.GeminiAdapter{}
 		models, err := adapter.ListModels()
 		if err != nil {
-			fmt.Printf("Erro ao listar modelos: %v\n", err)
+			fmt.Printf("Error listing models: %v\n", err)
 			return
 		}
 
-		fmt.Println("Modelos Gemini disponíveis (use guto config set press.model <nome>):")
+		fmt.Println("Available Gemini models (use guto config set press.model <name>):")
 		for _, m := range models {
-			// Remove o prefixo "models/" para ficar mais limpo
+			// Remove "models/" prefix for cleaner output
 			name := strings.TrimPrefix(m, "models/")
 			fmt.Printf("- %s\n", name)
 		}

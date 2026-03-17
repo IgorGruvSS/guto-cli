@@ -1,27 +1,36 @@
-# 🎙️ Guto (Your Personal Archivist)
+<p align="center">
+  <img src="assets/guto-gemini.png" width="880" alt="Guto Logo">
+</p>
 
-**Guto** é uma ferramenta de linha de comando (CLI) em Go, inspirada no legado de Johannes Gutenberg. Sua missão é capturar, transcrever e "prensar" (resumir) o conhecimento gerado em reuniões e conversas, transformando áudio volátil em registros permanentes e organizados.
+<p align="center">
+  <samp>
+    <b>VERBA VOLANT, SCRIPTA MANENT</b><br>
+    (Words fly away, the written word remains)
+  </samp>
+</p>
 
-> *"Verba volant, scripta manent."* (As palavras voam, o que é escrito permanece.)
+<p align="center">
+  <strong>Guto</strong> is a command-line tool (CLI) developed in Go, inspired by Johannes Gutenberg's legacy. Its mission is to capture, transcribe, and "press" (summarize) the knowledge generated in meetings and conversations, transforming volatile audio into permanent and organized records.
+</p>
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Features
 
-- **`guto listen`**: Captura áudio do sistema (sink monitor) e do microfone simultaneamente usando FFmpeg.
-- **`guto scribe`**: Transcreve arquivos de áudio para texto usando OpenAI Whisper (via `whisper-ctranslate2`).
-- **`guto press`**: Processa transcrições e gera sumários executivos em Markdown via Google Gemini.
-- **`guto scripta`**: Fluxo interativo completo (Gravar -> Titular -> Transcrever -> Resumir).
-- **`guto config`**: Gerenciamento de configurações local via CLI.
+- **`guto listen`**: Captures system audio (sink monitor) and microphone simultaneously using FFmpeg.
+- **`guto scribe`**: Transcribes audio files into text using OpenAI Whisper (via `whisper-ctranslate2`).
+- **`guto press`**: Processes transcriptions and generates executive summaries in Markdown via Google Gemini.
+- **`guto scripta`**: Complete interactive flow (Record -> Name -> Transcribe -> Summarize).
+- **`guto config`**: Local configuration management via CLI.
 
-## 🚀 Instalação Rápida
+## 🚀 Quick Installation
 
-O Guto possui um instalador universal para as principais distribuições Linux (**Ubuntu/Debian, Fedora, Arch, openSUSE**).
+Guto features a universal installer for major Linux distributions (**Ubuntu/Debian, Fedora, Arch, openSUSE**).
 
-### 1. Requisitos do Sistema
-Certifique-se de ter o `git` e `go` instalados (o script tentará instalar se não houver).
+### 1. System Requirements
+Ensure you have `git` and `go` installed (the script will attempt to install them if missing).
 
-### 2. Rodar o Instalador
+### 2. Run the Installer
 ```bash
 git clone https://github.com/IgorGruvSS/guto-cli.git
 cd guto-cli
@@ -29,78 +38,78 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
-O script irá:
-1. Instalar dependências de sistema (`ffmpeg`, `pulseaudio-utils`, `python3`).
-2. Compilar o binário Go e mover para `/usr/local/bin/guto`.
-3. Criar um ambiente virtual isolado para o Whisper em `/opt/guto/whisper-env`.
+The script will:
+1. Install system dependencies (`ffmpeg`, `pulseaudio-utils`, `python3`).
+2. Compile the Go binary and move it to `/usr/local/bin/guto`.
+3. Create an isolated virtual environment for Whisper in `/opt/guto/whisper-env`.
 
 ---
 
-## ⚙️ Configuração Pós-Instalação
+## ⚙️ Post-Installation Configuration
 
-Após rodar o instalador, você precisa configurar as chaves e caminhos no seu perfil de usuário (sem sudo):
+After running the installer, you need to configure keys and paths in your user profile (without sudo):
 
-### 1. Configurar o Scribe (Whisper)
-Aponte para o ambiente Python criado pelo instalador:
+### 1. Configure Scribe (Whisper)
+Point to the Python environment created by the installer:
 ```bash
 guto config set scribe.python_bin /opt/guto/whisper-env/bin/python3
 ```
 
-### 2. Configurar o Press (IA Gemini)
-1. Obtenha uma chave de API gratuita no [Google AI Studio](https://aistudio.google.com/app/apikey).
-2. Configure no Guto:
+### 2. Configure Press (Gemini AI)
+1. Obtain a free API key at [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Configure it in Guto:
 ```bash
-guto config set press.api_key SUA_CHAVE_AQUI
+guto config set press.api_key YOUR_API_KEY_HERE
 ```
 
-### 3. Listar e Escolher um Modelo de IA
-O Guto permite que você escolha qual modelo do Gemini deseja usar (o padrão é `gemini-2.5-flash`). Para ver os modelos disponíveis:
+### 3. List and Choose an AI Model
+Guto allows you to choose which Gemini model you want to use (default is `gemini-2.5-flash`). To see available models:
 ```bash
 guto config models
 ```
-Para escolher um modelo da lista:
+To select a model from the list:
 ```bash
 guto config set press.model gemini-1.5-pro
 ```
 
-### 4. Verificar Configurações
+### 4. Verify Settings
 ```bash
 guto config get
 ```
 
 ---
 
-## 📖 Como Usar (O Fluxo Scripta)
+## 📖 How to Use (The Scripta Flow)
 
-O comando principal para o dia a dia é o `guto scripta`, que guia você por todo o processo:
+The main command for daily use is `guto scripta`, which guides you through the entire process:
 
-1. **Gravação**: O Guto começa a ouvir o áudio do seu microfone e do sistema (perfeito para chamadas no Zoom/Teams/Meet).
-2. **Encerramento**: Pressione `Enter` para parar a gravação.
-3. **Titularização**: Dê um nome para a reunião (ex: `Daily-Sync`).
-4. **Transcrição**: O Guto pergunta se deseja transcrever agora.
-5. **Sumário**: O Guto gera um arquivo `.md` com o resumo executivo, decisões e próximos passos.
+1. **Recording**: Guto starts listening to your microphone and system audio (perfect for Zoom/Teams/Meet calls).
+2. **Stopping**: Press `Enter` to stop recording.
+3. **Naming**: Give the meeting a name (e.g., `Daily-Sync`).
+4. **Transcription**: Guto asks if you want to transcribe it now.
+5. **Summary**: Guto generates a `.md` file with the executive summary, decisions, and next steps.
 
-Os arquivos são organizados automaticamente no diretório `Output/`:
-- `Output/audio/`: Matrizes originais `.wav`.
-- `Output/scribe/`: Transcrições brutas `.txt`.
-- `Output/press/`: Sumários finais `.md`.
-
----
-
-## 🏗️ Arquitetura
-
-O projeto segue os princípios da **Arquitetura Hexagonal (Ports and Adapters)**:
-- `internal/ports/`: Define as interfaces de áudio, transcrição e IA.
-- `internal/adapters/`: Implementações concretas (FFmpeg, Whisper, Gemini).
-- `cmd/`: Orquestração via Cobra CLI.
-
-Isso facilita a troca de provedores no futuro (ex: usar OpenAI GPT em vez de Gemini, ou Ollama local).
+Files are automatically organized in the `Output/` directory:
+- `Output/audio/`: Original `.wav` master files.
+- `Output/scribe/`: Raw `.txt` transcriptions.
+- `Output/press/`: Final `.md` summaries.
 
 ---
 
-## 🛠️ Desenvolvimento Local
+## 🏗️ Architecture
 
-Para compilar manualmente:
+The project follows the principles of **Hexagonal Architecture (Ports and Adapters)**:
+- `internal/ports/`: Defines audio, transcription, and AI interfaces.
+- `internal/adapters/`: Concrete implementations (FFmpeg, Whisper, Gemini).
+- `cmd/`: Orchestration via Cobra CLI.
+
+This facilitates swapping providers in the future (e.g., using OpenAI GPT instead of Gemini, or local Ollama).
+
+---
+
+## 🛠️ Local Development
+
+To compile manually:
 ```bash
 go build -o guto main.go
 ./guto --help
@@ -108,8 +117,8 @@ go build -o guto main.go
 
 ---
 
-## 📄 Licença
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.
+## 📄 License
+This project is under the MIT license. See the `LICENSE` file for details.
 
 ---
-*Guto: Devolvendo a permanência à palavra falada.*
+*Guto: Giving permanence back to the spoken word.*

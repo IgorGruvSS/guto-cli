@@ -1,7 +1,7 @@
 # GEMINI.md - Guto CLI Project Context
 
 ## 📚 Project Overview
-**Guto** (Guto: Your Personal Archivist) is a command-line tool (CLI) developed in Go, inspired by Johannes Gutenberg's legacy. Its mission is to capture, transcribe, and "press" (summarize) the knowledge generated in meetings and conversations, transforming volatile audio into permanent and organized records.
+**Guto** (Your Personal Archivist) is a command-line tool (CLI) developed in Go, inspired by Johannes Gutenberg's legacy. Its mission is to capture, transcribe, and "press" (summarize) the knowledge generated in meetings and conversations, transforming volatile audio into permanent and organized records.
 
 ### 🛠️ Core Technologies
 - **Language:** Go (v1.25.6+)
@@ -29,7 +29,7 @@ The project follows the principles of **Hexagonal Architecture (Ports and Adapte
 
 ## 🛠️ Configuration and Installation
 
-### Automatic Installation (Debian/Ubuntu)
+### Automatic Installation (Universal Linux)
 The project includes an installation script to facilitate setup:
 
 ```bash
@@ -38,7 +38,7 @@ sudo ./install.sh
 This will install dependencies like FFmpeg and Python, compile the binary, and move it to `/usr/local/bin`.
 
 ### Configuration (`guto config`)
-Guto now uses a configuration file (`~/.config/guto/config.yaml`) managed via the CLI.
+Guto uses a configuration file (`~/.config/guto/config.yaml`) managed via the CLI.
 
 Examples:
 ```bash
@@ -55,14 +55,14 @@ guto config get
 ### Dependencies
 - **FFmpeg:** Mandatory for audio capture.
 - **Python + Whisper:** Mandatory for transcription.
-- **Gemini CLI:** Mandatory for summarization (currently).
+- **Gemini API:** Mandatory for summarization.
 
 ## 🏗️ Architecture and Roadmap
 The project follows the **Hexagonal Architecture**.
 - **Future:** We plan to support multiple AI providers (OpenAI, Claude, Ollama). See `docs/AI_ROADMAP.md` for details.
 
 ### Audio Adapters
-The `FFmpegAdapter` automatically detects the default sink (system audio) and the default source (microphone) using `pactl`. This can be overridden via configuration.
+The `FFmpegAdapter` automatically detects the default sink (system audio) and the default source (microphone) using PulseAudio utilities. This can be overridden via configuration.
 
 ## 💻 Development
 

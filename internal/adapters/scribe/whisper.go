@@ -12,10 +12,9 @@ import (
 type WhisperAdapter struct{}
 
 func (a *WhisperAdapter) Transcribe(inputPath string) (string, error) {
-	// Pega configurações ou usa defaults
 	pythonBin := viper.GetString("scribe.python_bin")
 	if pythonBin == "" {
-		// Default antigo hardcoded como fallback, mas ideal é configurar
+		// Default to local user path if no specific binary is configured
 		pythonBin = filepath.Join(os.Getenv("HOME"), ".local/share/whisper-env/bin/python3")
 	}
 
@@ -26,7 +25,7 @@ func (a *WhisperAdapter) Transcribe(inputPath string) (string, error) {
 
 	device := viper.GetString("scribe.device")
 	if device == "" {
-		device = "cuda" // Default para GPU, usuário deve mudar para "cpu" se não tiver NVIDIA
+		device = "cuda"
 	}
 
 	computeType := viper.GetString("scribe.compute_type")
@@ -36,7 +35,7 @@ func (a *WhisperAdapter) Transcribe(inputPath string) (string, error) {
 
 	outputDir := filepath.Dir(inputPath)
 
-	fmt.Printf("📝 Scribe iniciando transcrição com: Model=%s, Device=%s\n", model, device)
+	fmt.Printf("📝 Scribe starting transcription with: Model=%s, Device=%s\n", model, device)
 
 	cmd := exec.Command(pythonBin, "-m", "whisper_ctranslate2.whisper_ctranslate2",
 		inputPath,
@@ -52,7 +51,7 @@ func (a *WhisperAdapter) Transcribe(inputPath string) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return "", fmt.Errorf("erro ao rodar whisper (verifique 'scribe.python_bin' na config): %v", err)
+		return "", fmt.Errorf("error running whisper (check 'scribe.python_bin' in config): %v", err)
 	}
 
 	ext := filepath.Ext(inputPath)

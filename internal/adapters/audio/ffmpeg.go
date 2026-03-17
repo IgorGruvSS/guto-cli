@@ -15,18 +15,15 @@ type FFmpegAdapter struct {
 }
 
 func (a *FFmpegAdapter) Listen(filename string) error {
-	// 1. Tenta pegar da configuração
 	outSource := viper.GetString("audio.output_monitor")
 	micSource := viper.GetString("audio.input_source")
 
-	// 2. Se não estiver configurado, tenta detectar automaticamente
 	if outSource == "" {
 		detected, err := getDefaultSinkMonitor()
 		if err == nil {
 			outSource = detected
 		} else {
-			// Fallback ou erro
-			return fmt.Errorf("não foi possível detectar o áudio do sistema (sink monitor). Configure manualmente em 'audio.output_monitor' ou verifique o PulseAudio: %v", err)
+			return fmt.Errorf("could not detect system audio (sink monitor). Configure manually in 'audio.output_monitor' or check PulseAudio: %v", err)
 		}
 	}
 
@@ -35,11 +32,11 @@ func (a *FFmpegAdapter) Listen(filename string) error {
 		if err == nil {
 			micSource = detected
 		} else {
-			return fmt.Errorf("não foi possível detectar o microfone (source). Configure manualmente em 'audio.input_source': %v", err)
+			return fmt.Errorf("could not detect microphone (source). Configure manually in 'audio.input_source': %v", err)
 		}
 	}
 
-	fmt.Printf("🎙️  Capturando de:\n  - Sistema: %s\n  - Microfone: %s\n", outSource, micSource)
+	fmt.Printf("🎙️  Capturing from:\n  - System: %s\n  - Microphone: %s\n", outSource, micSource)
 
 	a.Cmd = exec.Command("ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin",
 		"-f", "pulse", "-i", outSource,
@@ -52,13 +49,12 @@ func (a *FFmpegAdapter) Listen(filename string) error {
 
 func (a *FFmpegAdapter) Stop() error {
 	if a.Cmd != nil && a.Cmd.Process != nil {
-		// Tenta encerrar graciosamente com Interrupt
+		// Try to terminate gracefully with Interrupt before forcing a kill
 		err := a.Cmd.Process.Signal(os.Interrupt)
 		if err != nil {
-			return fmt.Errorf("erro ao enviar sinal de interrupção: %v", err)
+			return fmt.Errorf("error sending interrupt signal: %v", err)
 		}
 
-		// Aguarda o processo terminar ou força o encerramento após 2 segundos
 		done := make(chan error, 1)
 		go func() {
 			done <- a.Cmd.Wait()
@@ -68,15 +64,12 @@ func (a *FFmpegAdapter) Stop() error {
 		case err := <-done:
 			return err
 		case <-time.After(2 * time.Second):
-			// Se não fechar em 2s, mata o processo
 			a.Cmd.Process.Kill()
-			return fmt.Errorf("ffmpeg não encerrou a tempo e foi forçado a parar")
+			return fmt.Errorf("ffmpeg did not exit in time and was forced to stop")
 		}
 	}
-	return fmt.Errorf("nenhum processo de gravação ativo")
+	return fmt.Errorf("no active recording process")
 }
-
-// Helpers para detecção via pactl
 
 func getDefaultSinkMonitor() (string, error) {
 	cmd := exec.Command("sh", "-c", "pactl get-default-sink")

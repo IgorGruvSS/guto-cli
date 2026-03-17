@@ -15,37 +15,37 @@ import (
 
 var scriptaCmd = &cobra.Command{
 	Use:   "scripta",
-	Short: "Ciclo completo de registro: Verba volant, scripta manent",
+	Short: "Complete registration cycle: Verba volant, scripta manent",
 	Run: func(cmd *cobra.Command, args []string) {
 		audioDir := "Output/audio"
 		scribeDir := "Output/scribe"
 		pressDir := "Output/press"
-		
+
 		os.MkdirAll(audioDir, 0755)
 		os.MkdirAll(scribeDir, 0755)
 		os.MkdirAll(pressDir, 0755)
 
-		// --- FASE 1: LISTEN (OUVIR) ---
+		// --- PHASE 1: LISTEN ---
 		now := time.Now()
 		dateStr := now.Format("2006-01-02")
 		tempName := fmt.Sprintf("meeting_%s_%s_mixed.wav", dateStr, now.Format("15-04-05"))
 		tempPath := filepath.Join(audioDir, tempName)
 
 		recorder := &audio.FFmpegAdapter{}
-		fmt.Printf("🎙️  Guto iniciou a captura. O prelo está pronto...\n")
+		fmt.Printf("🎙️  Guto has started capturing. The press is ready...\n")
 		if err := recorder.Listen(tempPath); err != nil {
-			fmt.Printf("❌ Erro ao iniciar captura: %v\n", err)
+			fmt.Printf("❌ Error starting capture: %v\n", err)
 			return
 		}
 
-		fmt.Println("✅ Ouvindo... Pressione Enter para encerrar o registro verbal.")
+		fmt.Println("✅ Listening... Press Enter to end the verbal registration.")
 		var input string
 		fmt.Scanln(&input)
 		recorder.Stop()
-		fmt.Println("🛑 Verba finalizada.")
+		fmt.Println("🛑 Verbal registration finished.")
 
-		// --- FASE 2: RENAME (TITULAR) ---
-		fmt.Print("📝 Título para este Scripta (ex: Daily-Sync) ou Enter para padrão: ")
+		// --- PHASE 2: RENAME (TITLING) ---
+		fmt.Print("📝 Title for this Scripta (e.g., Daily-Sync) or Enter for default: ")
 		var title string
 		fmt.Scanln(&title)
 
@@ -55,69 +55,67 @@ var scriptaCmd = &cobra.Command{
 			newName := fmt.Sprintf("%s-%s.wav", dateStr, cleanName)
 			finalPath = filepath.Join(audioDir, newName)
 			os.Rename(tempPath, finalPath)
-			fmt.Printf("📂 Arquivo oficial: %s\n", newName)
+			fmt.Printf("📂 Official file: %s\n", newName)
 		}
 
-		// --- FASE 3: SCRIBE (ESCREVER) ---
-		fmt.Print("💡 Deseja que o Guto Scribe escreva este registro agora? (s/n): ")
+		// --- PHASE 3: SCRIBE (WRITING) ---
+		fmt.Print("💡 Do you want Guto Scribe to write this registration now? (y/n): ")
 		var confirmScribe string
 		fmt.Scanln(&confirmScribe)
 
-		if confirmScribe == "s" || confirmScribe == "S" {
+		if confirmScribe == "y" || confirmScribe == "Y" {
 			s := &scribe.WhisperAdapter{}
 			txtPath, err := s.Transcribe(finalPath)
 			if err != nil {
-				fmt.Printf("❌ Erro no Scribe: %v\n", err)
-				fmt.Println("⚠️  Fluxo interrompido devido a erro na transcrição.")
+				fmt.Printf("❌ Error in Scribe: %v\n", err)
+				fmt.Println("⚠️  Flow interrupted due to transcription error.")
 				return
 			}
-			
-			// Move .txt to Output/scribe
+
 			newTxtPath := filepath.Join(scribeDir, filepath.Base(txtPath))
 			if err := os.Rename(txtPath, newTxtPath); err == nil {
 				txtPath = newTxtPath
 			}
-			fmt.Printf("✅ Scripta transcrito: %s\n", txtPath)
+			fmt.Printf("✅ Scripta transcribed: %s\n", txtPath)
 
-			// CLEANUP
-			fmt.Print("🗑️  Deseja descartar a matriz de áudio (.wav)? (s/n): ")
+			fmt.Print("🗑️  Do you want to discard the audio master (.wav)? (y/n): ")
 			var confirmClean string
 			fmt.Scanln(&confirmClean)
-			if confirmClean == "s" || confirmClean == "S" {
+			if confirmClean == "y" || confirmClean == "Y" {
 				os.Remove(finalPath)
-				fmt.Println("✅ Matriz descartada. Espaço recuperado.")
+				fmt.Println("✅ Master discarded. Space recovered.")
 			}
 
-			// --- FASE 4: PRESS (PRENSAR) ---
-			fmt.Print("🤖 Guto Press: Gerar sumário executivo em Markdown? (s/n): ")
+			// --- PHASE 4: PRESS (PRESSING) ---
+			fmt.Print("🤖 Guto Press: Generate executive summary in Markdown? (y/n): ")
 			var confirmPress string
 			fmt.Scanln(&confirmPress)
-			if confirmPress == "s" || confirmPress == "S" {
+			if confirmPress == "y" || confirmPress == "Y" {
 				content, err := os.ReadFile(txtPath)
 				if err != nil {
-					fmt.Printf("❌ Erro ao ler transcrição: %v\n", err)
+					fmt.Printf("❌ Error reading transcription: %v\n", err)
 					return
 				}
 				p := &press.GeminiAdapter{}
 				summary, err := p.Summarize(string(content))
 				if err != nil {
-					fmt.Printf("❌ Erro no Press: %v\n", err)
+					fmt.Printf("❌ Error in Press: %v\n", err)
 					return
 				}
-				
+
 				mdName := strings.TrimSuffix(filepath.Base(txtPath), ".txt") + ".md"
 				mdPath := filepath.Join(pressDir, mdName)
 				err = os.WriteFile(mdPath, []byte(summary), 0644)
 				if err != nil {
-					fmt.Printf("❌ Erro ao salvar sumário: %v\n", err)
+					fmt.Printf("❌ Error saving summary: %v\n", err)
 					return
 				}
-				fmt.Printf("✅ Essência prensada em: %s\n", mdPath)
+				fmt.Printf("✅ Essence pressed at: %s\n", mdPath)
 			}
 		} else {
-			fmt.Println("ℹ️  Transcrição pulada pelo usuário.")
+			fmt.Println("ℹ️  Transcription skipped by user.")
 		}
-		fmt.Println("🏛️  Scripta concluído com sucesso. Verba volant, scripta manent.")
+		fmt.Println("🏛️  Scripta completed successfully. Verba volant, scripta manent.")
 	},
 }
 

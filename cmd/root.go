@@ -12,8 +12,8 @@ var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Use:   "guto",
-	Short: "Guto: Seu Arquivista Pessoal (O herdeiro de Gutenberg)",
-	Long:  `📚 Guto captura suas reuniões, transcreve com precisão e prensa o conhecimento em sumários executivos.`,
+	Short: "Guto: Your Personal Archivist (Gutenberg's heir)",
+	Long:  `📚 Guto captures your meetings, transcribes with precision, and presses the knowledge into executive summaries.`,
 }
 
 func Execute() {
@@ -40,7 +40,6 @@ func initConfig() {
 		}
 
 		configPath := home + "/.config/guto"
-		// Ensure directory exists
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
 			os.MkdirAll(configPath, 0755)
 		}
@@ -53,6 +52,5 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		// Config file loaded successfully
 	}
 }

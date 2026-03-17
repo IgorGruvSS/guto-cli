@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -51,7 +52,26 @@ func (a *FFmpegAdapter) Listen(filename string) error {
 
 func (a *FFmpegAdapter) Stop() error {
 	if a.Cmd != nil && a.Cmd.Process != nil {
-		return a.Cmd.Process.Signal(os.Interrupt)
+		// Tenta encerrar graciosamente com Interrupt
+		err := a.Cmd.Process.Signal(os.Interrupt)
+		if err != nil {
+			return fmt.Errorf("erro ao enviar sinal de interrupção: %v", err)
+		}
+
+		// Aguarda o processo terminar ou força o encerramento após 2 segundos
+		done := make(chan error, 1)
+		go func() {
+			done <- a.Cmd.Wait()
+		}()
+
+		select {
+		case err := <-done:
+			return err
+		case <-time.After(2 * time.Second):
+			// Se não fechar em 2s, mata o processo
+			a.Cmd.Process.Kill()
+			return fmt.Errorf("ffmpeg não encerrou a tempo e foi forçado a parar")
+		}
 	}
 	return fmt.Errorf("nenhum processo de gravação ativo")
 }

@@ -152,8 +152,15 @@ go build -o guto main.go
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! As Guto is a solo-led project, please ensure you read the [Contributing Guidelines](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before submitting a Pull Request.
+
+For security-related issues, please refer to our [Security Policy](SECURITY.md).
+
 ## 📄 License
-This project is under the MIT license. See the `LICENSE` file for details.
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
 
 ---
 *Guto: Giving permanence back to the spoken word.*

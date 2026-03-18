@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os/exec"
 	"sort"
 	"strings"
 
@@ -85,9 +86,49 @@ var configModelsCmd = &cobra.Command{
 	},
 }
 
+var configAudioDevicesCmd = &cobra.Command{
+	Use:   "audio-devices",
+	Short: "List available audio devices for system and microphone",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("🔍 Scanning for audio devices...")
+
+		// List Sinks (Monitors for system audio)
+		fmt.Println("\n🔈 System Audio Options (Monitors - set to 'audio.output_monitor'):")
+		sinks, err := exec.Command("sh", "-c", "pactl list short sinks | awk '{print $2}'").Output()
+		if err == nil {
+			lines := strings.Split(strings.TrimSpace(string(sinks)), "\n")
+			for _, line := range lines {
+				if line != "" {
+					fmt.Printf("- %s.monitor\n", line)
+				}
+			}
+		} else {
+			fmt.Println("  (Error listing sinks. Is PulseAudio/PipeWire running?)")
+		}
+
+		// List Sources (Microphones)
+		fmt.Println("\n🎙️  Microphone Options (Sources - set to 'audio.input_source'):")
+		sources, err := exec.Command("sh", "-c", "pactl list short sources | awk '{print $2}'").Output()
+		if err == nil {
+			lines := strings.Split(strings.TrimSpace(string(sources)), "\n")
+			for _, line := range lines {
+				if line != "" && !strings.HasSuffix(line, ".monitor") {
+					fmt.Printf("- %s\n", line)
+				}
+			}
+		} else {
+			fmt.Println("  (Error listing sources.)")
+		}
+
+		fmt.Println("\n💡 Use: guto config set audio.input_source <name>")
+		fmt.Println("   Use: guto config set audio.output_monitor <name>")
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configGetCmd)
 	configCmd.AddCommand(configSetCmd)
 	configCmd.AddCommand(configModelsCmd)
+	configCmd.AddCommand(configAudioDevicesCmd)
 }

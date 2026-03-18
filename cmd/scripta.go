@@ -7,9 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IgorGruvSS/guto/internal/adapters/audio"
-	"github.com/IgorGruvSS/guto/internal/adapters/press"
-	"github.com/IgorGruvSS/guto/internal/adapters/scribe"
 	"github.com/spf13/cobra"
 )
 
@@ -31,9 +28,8 @@ var scriptaCmd = &cobra.Command{
 		tempName := fmt.Sprintf("meeting_%s_%s_mixed.wav", dateStr, now.Format("15-04-05"))
 		tempPath := filepath.Join(audioDir, tempName)
 
-		recorder := &audio.FFmpegAdapter{}
 		fmt.Printf("🎙️  Guto has started capturing. The press is ready...\n")
-		if err := recorder.Listen(tempPath); err != nil {
+		if err := audioRecorder.Listen(tempPath); err != nil {
 			fmt.Printf("❌ Error starting capture: %v\n", err)
 			return
 		}
@@ -41,7 +37,7 @@ var scriptaCmd = &cobra.Command{
 		fmt.Println("✅ Listening... Press Enter to end the verbal registration.")
 		var input string
 		fmt.Scanln(&input)
-		recorder.Stop()
+		audioRecorder.Stop()
 		fmt.Println("🛑 Verbal registration finished.")
 
 		// --- PHASE 2: RENAME (TITLING) ---
@@ -64,8 +60,7 @@ var scriptaCmd = &cobra.Command{
 		fmt.Scanln(&confirmScribe)
 
 		if confirmScribe == "y" || confirmScribe == "Y" {
-			s := &scribe.WhisperAdapter{}
-			txtPath, err := s.Transcribe(finalPath)
+			txtPath, err := scribeAdapter.Transcribe(finalPath)
 			if err != nil {
 				fmt.Printf("❌ Error in Scribe: %v\n", err)
 				fmt.Println("⚠️  Flow interrupted due to transcription error.")
@@ -96,8 +91,7 @@ var scriptaCmd = &cobra.Command{
 					fmt.Printf("❌ Error reading transcription: %v\n", err)
 					return
 				}
-				p := &press.GeminiAdapter{}
-				summary, err := p.Summarize(string(content))
+				summary, err := pressAdapter.Summarize(string(content))
 				if err != nil {
 					fmt.Printf("❌ Error in Press: %v\n", err)
 					return

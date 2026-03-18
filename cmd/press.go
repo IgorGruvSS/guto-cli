@@ -7,8 +7,11 @@ import (
 	"strings"
 
 	"github.com/IgorGruvSS/guto/internal/adapters/press"
+	"github.com/IgorGruvSS/guto/internal/ports"
 	"github.com/spf13/cobra"
 )
+
+var pressAdapter ports.Press = &press.GeminiAdapter{}
 
 var pressCmd = &cobra.Command{
 	Use:   "press [file.txt]",
@@ -16,19 +19,18 @@ var pressCmd = &cobra.Command{
 	Short: "Guto presses (Summarizes) the information",
 	Run: func(cmd *cobra.Command, args []string) {
 		inputPath := args[0]
-		fmt.Printf("📚 Guto's Press is extracting the essence of: %s...\n", inputPath)
+		fmt.Fprintf(cmd.OutOrStdout(), "📚 Guto's Press is extracting the essence of: %s...\n", inputPath)
 
 		content, err := os.ReadFile(inputPath)
 		if err != nil {
-			fmt.Printf("❌ Error reading file: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error reading file: %v\n", err)
 			return
 		}
 
-		p := &press.GeminiAdapter{}
-		summary, err := p.Summarize(string(content))
+		summary, err := pressAdapter.Summarize(string(content))
 
 		if err != nil {
-			fmt.Printf("❌ Error in summarization: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error in summarization: %v\n", err)
 			return
 		}
 
@@ -39,11 +41,11 @@ var pressCmd = &cobra.Command{
 		outputPath := filepath.Join(pressDir, mdName)
 
 		if err := os.WriteFile(outputPath, []byte(summary), 0644); err != nil {
-			fmt.Printf("❌ Error saving summary: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error saving summary: %v\n", err)
 			return
 		}
 
-		fmt.Printf("✅ Summary saved to: %s\n", outputPath)
+		fmt.Fprintf(cmd.OutOrStdout(), "✅ Summary saved to: %s\n", outputPath)
 	},
 }
 

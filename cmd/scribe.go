@@ -6,8 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/IgorGruvSS/guto/internal/adapters/scribe"
+	"github.com/IgorGruvSS/guto/internal/ports"
 	"github.com/spf13/cobra"
 )
+
+var scribeAdapter ports.Scribe = &scribe.WhisperAdapter{}
 
 var scribeCmd = &cobra.Command{
 	Use:   "scribe [file.wav]",
@@ -15,13 +18,12 @@ var scribeCmd = &cobra.Command{
 	Short: "Guto transcribes the audio",
 	Run: func(cmd *cobra.Command, args []string) {
 		inputPath := args[0]
-		fmt.Printf("✍️  Guto Scribe is transcribing: %s...\n", inputPath)
+		fmt.Fprintf(cmd.OutOrStdout(), "✍️  Guto Scribe is transcribing: %s...\n", inputPath)
 
-		s := &scribe.WhisperAdapter{}
-		txtPath, err := s.Transcribe(inputPath)
+		txtPath, err := scribeAdapter.Transcribe(inputPath)
 
 		if err != nil {
-			fmt.Printf("❌ Error in transcription: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error in transcription: %v\n", err)
 			return
 		}
 
@@ -32,17 +34,17 @@ var scribeCmd = &cobra.Command{
 			txtPath = newTxtPath
 		}
 
-		fmt.Printf("✅ Transcription completed: %s\n", txtPath)
+		fmt.Fprintf(cmd.OutOrStdout(), "✅ Transcription completed: %s\n", txtPath)
 
-		fmt.Print("🗑️  Do you want to discard the original audio master? (y/n): ")
+		fmt.Fprint(cmd.OutOrStdout(), "🗑️  Do you want to discard the original audio master? (y/n): ")
 		var confirm string
-		fmt.Scanln(&confirm)
+		fmt.Fscanln(cmd.InOrStdin(), &confirm)
 
 		if confirm == "y" || confirm == "Y" {
 			if err := os.Remove(inputPath); err != nil {
-				fmt.Printf("⚠️ Error removing audio: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStdout(), "⚠️ Error removing audio: %v\n", err)
 			} else {
-				fmt.Println("✅ Master discarded. Space recovered.")
+				fmt.Fprintln(cmd.OutOrStdout(), "✅ Master discarded. Space recovered.")
 			}
 		}
 	},

@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/IgorGruvSS/guto/internal/adapters/press"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -70,8 +69,7 @@ var configModelsCmd = &cobra.Command{
 	Short: "List available AI models",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Currently fixed to Gemini, could be provider-specific in the future
-		adapter := &press.GeminiAdapter{}
-		models, err := adapter.ListModels()
+		models, err := pressAdapter.ListModels()
 		if err != nil {
 			fmt.Printf("Error listing models: %v\n", err)
 			return

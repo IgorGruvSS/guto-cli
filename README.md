@@ -72,7 +72,27 @@ To select a model from the list:
 guto config set press.model gemini-1.5-pro
 ```
 
-### 4. Verify Settings
+### 4. Configure Audio and Output (New)
+If the automatic detection fails or you want to save files in a specific location:
+
+**List available audio devices:**
+```bash
+guto config audio-devices
+```
+
+**Set system audio and microphone:**
+```bash
+guto config set audio.output_monitor alsa_output.pci-0000_00_1f.3.analog-stereo.monitor
+guto config set audio.input_source alsa_input.pci-0000_00_1f.3.analog-stereo
+```
+
+**Set a custom output directory:**
+By default, Guto creates an `Output/` folder in the directory where it is executed. To set a fixed global location:
+```bash
+guto config set output.base_dir /home/user/Documents/Meetings
+```
+
+### 5. Verify Settings
 ```bash
 guto config get
 ```

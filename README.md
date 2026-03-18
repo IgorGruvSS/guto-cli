@@ -43,6 +43,21 @@ The script will:
 2. Compile the Go binary and move it to `/usr/local/bin/guto`.
 3. Create an isolated virtual environment for Whisper in `/opt/guto/whisper-env`.
 
+### 🔄 How to Update
+If you have already installed Guto and want to update to the latest version or apply your local changes:
+
+1. **Full Update (Recommended for new versions):**
+   Run the installer again to ensure all dependencies and environments are updated:
+   ```bash
+   sudo ./install.sh
+   ```
+
+2. **Quick Update (Go code changes only):**
+   If you only modified the Go files, you can use the Makefile to quickly recompile and reinstall the binary:
+   ```bash
+   make install
+   ```
+
 ---
 
 ## ⚙️ Post-Installation Configuration

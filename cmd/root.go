@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -53,4 +54,17 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 	}
+}
+
+// getOutputPath ensures all meeting records are centralized and persistent.
+// It allows defining a project-specific or cloud-synced base directory (via output.base_dir),
+// preventing volatile data from being scattered across different execution paths.
+func getOutputPath(subDir string) string {
+	base := viper.GetString("output.base_dir")
+	if base == "" {
+		base = "Output"
+	}
+
+	fullPath := filepath.Join(base, subDir)
+	return fullPath
 }

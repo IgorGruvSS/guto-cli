@@ -32,7 +32,7 @@ var pressCmd = &cobra.Command{
 			return
 		}
 
-		pressDir := "Output/press"
+		pressDir := getOutputPath("press")
 		os.MkdirAll(pressDir, 0755)
 
 		mdName := strings.TrimSuffix(filepath.Base(inputPath), filepath.Ext(inputPath)) + ".md"

@@ -17,9 +17,9 @@ var scriptaCmd = &cobra.Command{
 	Use:   "scripta",
 	Short: "Complete registration cycle: Verba volant, scripta manent",
 	Run: func(cmd *cobra.Command, args []string) {
-		audioDir := "Output/audio"
-		scribeDir := "Output/scribe"
-		pressDir := "Output/press"
+		audioDir := getOutputPath("audio")
+		scribeDir := getOutputPath("scribe")
+		pressDir := getOutputPath("press")
 
 		os.MkdirAll(audioDir, 0755)
 		os.MkdirAll(scribeDir, 0755)

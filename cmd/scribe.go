@@ -25,7 +25,7 @@ var scribeCmd = &cobra.Command{
 			return
 		}
 
-		scribeDir := "Output/scribe"
+		scribeDir := getOutputPath("scribe")
 		os.MkdirAll(scribeDir, 0755)
 		newTxtPath := filepath.Join(scribeDir, filepath.Base(txtPath))
 		if err := os.Rename(txtPath, newTxtPath); err == nil {

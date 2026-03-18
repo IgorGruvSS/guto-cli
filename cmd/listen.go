@@ -14,7 +14,7 @@ var listenCmd = &cobra.Command{
 	Use:   "listen",
 	Short: "Guto listens to the meeting",
 	Run: func(cmd *cobra.Command, args []string) {
-		outputDir := "Output/audio"
+		outputDir := getOutputPath("audio")
 		if err := os.MkdirAll(outputDir, 0755); err != nil {
 			fmt.Printf("❌ Error creating directory: %v\n", err)
 			return

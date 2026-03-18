@@ -34,8 +34,8 @@ Ensure you have `git` and `go` installed (the script will attempt to install the
 ```bash
 git clone https://github.com/IgorGruvSS/guto-cli.git
 cd guto-cli
-chmod +x install.sh
-sudo ./install.sh
+chmod +x scripts/install.sh
+sudo ./scripts/install.sh
 ```
 
 The script will:
@@ -49,7 +49,7 @@ If you have already installed Guto and want to update to the latest version or a
 1. **Full Update (Recommended for new versions):**
    Run the installer again to ensure all dependencies and environments are updated:
    ```bash
-   sudo ./install.sh
+   sudo ./scripts/install.sh
    ```
 
 2. **Quick Update (Go code changes only):**
@@ -87,48 +87,6 @@ To select a model from the list:
 guto config set press.model gemini-1.5-pro
 ```
 
-### 4. Configure Audio and Output (New)
-If the automatic detection fails or you want to save files in a specific location:
-
-**List available audio devices:**
-```bash
-guto config audio-devices
-```
-
-**Set system audio and microphone:**
-```bash
-guto config set audio.output_monitor alsa_output.pci-0000_00_1f.3.analog-stereo.monitor
-guto config set audio.input_source alsa_input.pci-0000_00_1f.3.analog-stereo
-```
-
-**Set a custom output directory:**
-By default, Guto creates an `Output/` folder in the directory where it is executed. To set a fixed global location:
-```bash
-guto config set output.base_dir /home/user/Documents/Meetings
-```
-
-### 5. Verify Settings
-```bash
-guto config get
-```
-
----
-
-## 📖 How to Use (The Scripta Flow)
-
-The main command for daily use is `guto scripta`, which guides you through the entire process:
-
-1. **Recording**: Guto starts listening to your microphone and system audio (perfect for Zoom/Teams/Meet calls).
-2. **Stopping**: Press `Enter` to stop recording.
-3. **Naming**: Give the meeting a name (e.g., `Daily-Sync`).
-4. **Transcription**: Guto asks if you want to transcribe it now.
-5. **Summary**: Guto generates a `.md` file with the executive summary, decisions, and next steps.
-
-Files are automatically organized in the `Output/` directory:
-- `Output/audio/`: Original `.wav` master files.
-- `Output/scribe/`: Raw `.txt` transcriptions.
-- `Output/press/`: Final `.md` summaries.
-
 ---
 
 ## 🏗️ Architecture
@@ -138,29 +96,21 @@ The project follows the principles of **Hexagonal Architecture (Ports and Adapte
 - `internal/adapters/`: Concrete implementations (FFmpeg, Whisper, Gemini).
 - `cmd/`: Orchestration via Cobra CLI.
 
-This facilitates swapping providers in the future (e.g., using OpenAI GPT instead of Gemini, or local Ollama).
-
----
-
-## 🛠️ Local Development
-
-To compile manually:
-```bash
-go build -o guto main.go
-./guto --help
-```
+All core Go code is located in the root directory following standard Go conventions, while auxiliary files are organized as follows:
+- `scripts/`: System installation and uninstallation scripts.
+- `docs/`: Project documentation, licenses, and community guidelines.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! As Guto is a solo-led project, please ensure you read the [Contributing Guidelines](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before submitting a Pull Request.
+Contributions are welcome! As Guto is a solo-led project, please ensure you read the [Contributing Guidelines](docs/CONTRIBUTING.md) and the [Code of Conduct](docs/CODE_OF_CONDUCT.md) before submitting a Pull Request.
 
-For security-related issues, please refer to our [Security Policy](SECURITY.md).
+For security-related issues, please refer to our [Security Policy](docs/SECURITY.md).
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
+This project is licensed under the **MIT License**. See the [LICENSE](docs/LICENSE) file for the full text.
 
 ---
 *Guto: Giving permanence back to the spoken word.*

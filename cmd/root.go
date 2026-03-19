@@ -42,7 +42,7 @@ func initConfig() {
 
 		configPath := home + "/.config/guto"
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
-			os.MkdirAll(configPath, 0755)
+			_ = os.MkdirAll(configPath, 0755)
 		}
 
 		viper.AddConfigPath(configPath)
@@ -52,8 +52,7 @@ func initConfig() {
 
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err == nil {
-	}
+	_ = viper.ReadInConfig()
 }
 
 // getOutputPath ensures all meeting records are centralized and persistent.

@@ -21,7 +21,7 @@ type PressTestSuite struct {
 func (suite *PressTestSuite) SetupTest() {
 	suite.mockPress = new(mocks.MockPress)
 	pressAdapter = suite.mockPress
-	
+
 	// Create temp directory for output
 	var err error
 	suite.tempDir, err = os.MkdirTemp("", "guto-test-*")
@@ -48,25 +48,25 @@ func (suite *PressTestSuite) TestPressCommand_Success() {
 	// Execute command
 	buf := new(bytes.Buffer)
 	pressCmd.SetOut(buf)
-	
+
 	pressCmd.Run(pressCmd, []string{inputPath})
 
 	// Verify output file
 	outputPath := filepath.Join(suite.tempDir, "press", "test.md")
 	assert.FileExists(suite.T(), outputPath)
-	
+
 	savedContent, _ := os.ReadFile(outputPath)
 	assert.Equal(suite.T(), expectedSummary, string(savedContent))
-	
+
 	suite.mockPress.AssertExpectations(suite.T())
 }
 
 func (suite *PressTestSuite) TestPressCommand_FileNotFound() {
 	buf := new(bytes.Buffer)
 	pressCmd.SetOut(buf)
-	
+
 	pressCmd.Run(pressCmd, []string{"nonexistent.txt"})
-	
+
 	assert.Contains(suite.T(), buf.String(), "Error reading file")
 }
 

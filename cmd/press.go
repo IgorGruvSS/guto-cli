@@ -35,7 +35,10 @@ var pressCmd = &cobra.Command{
 		}
 
 		pressDir := getOutputPath("press")
-		os.MkdirAll(pressDir, 0755)
+		if err := os.MkdirAll(pressDir, 0755); err != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error creating directory: %v\n", err)
+			return
+		}
 
 		mdName := strings.TrimSuffix(filepath.Base(inputPath), filepath.Ext(inputPath)) + ".md"
 		outputPath := filepath.Join(pressDir, mdName)

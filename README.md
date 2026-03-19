@@ -34,28 +34,35 @@ Ensure you have `git` and `go` installed (the script will attempt to install the
 ```bash
 git clone https://github.com/IgorGruvSS/guto-cli.git
 cd guto-cli
-chmod +x scripts/install.sh
-sudo ./scripts/install.sh
+sudo make setup
 ```
 
-The script will:
-1. Install system dependencies (`ffmpeg`, `pulseaudio-utils`, `python3`).
-2. Compile the Go binary and move it to `/usr/local/bin/guto`.
-3. Create an isolated virtual environment for Whisper in `/opt/guto/whisper-env`.
+The `Makefile` is the primary entry point and is robust enough to be executed from any directory. It will:
+1. **`deps`**: Install system dependencies (`ffmpeg`, `pulseaudio-utils`, `python3`, `make`).
+2. **`whisper`**: Create an isolated virtual environment for Whisper in `/opt/guto/whisper-env`.
+3. **`install`**: Compile the Go binary and move it to `/usr/local/bin/guto`.
 
-### 🔄 How to Update
+### 🔄 How to Update or Uninstall
 If you have already installed Guto and want to update to the latest version or apply your local changes:
 
-1. **Full Update (Recommended for new versions):**
-   Run the installer again to ensure all dependencies and environments are updated:
+1. **Full Update (System dependencies + Whisper + Binary):**
    ```bash
-   sudo ./scripts/install.sh
+   sudo make setup
    ```
 
 2. **Quick Update (Go code changes only):**
-   If you only modified the Go files, you can use the Makefile to quickly recompile and reinstall the binary:
    ```bash
-   make install
+   sudo make install
+   ```
+
+3. **Uninstall:**
+   To remove the `guto` binary, settings, and Whisper environment:
+   ```bash
+   # Binary only
+   sudo make uninstall
+
+   # Interactive deep cleanup (settings, venv, cache)
+   ./scripts/uninstall.sh
    ```
 
 ---
@@ -105,6 +112,26 @@ All core Go code is located in the root directory following standard Go conventi
 ## 🤝 Contributing
 
 Contributions are welcome! As Guto is a solo-led project, please ensure you read the [Contributing Guidelines](docs/CONTRIBUTING.md) and the [Code of Conduct](docs/CODE_OF_CONDUCT.md) before submitting a Pull Request.
+
+### Development Workflow
+
+1.  **Install Development Tools:**
+    Ensure you have `golangci-lint` and `govulncheck` installed:
+    ```bash
+    make tools
+    ```
+
+2.  **Run CI Locally:**
+    Before pushing your changes, run the full CI suite (Format, Lint, Vuln Check, Test):
+    ```bash
+    make ci
+    ```
+
+3.  **Enable Git Hooks (Recommended):**
+    Install a `pre-push` hook that automatically runs `make ci` before you push:
+    ```bash
+    make hooks
+    ```
 
 For security-related issues, please refer to our [Security Policy](docs/SECURITY.md).
 

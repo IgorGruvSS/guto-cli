@@ -18,9 +18,9 @@ var scriptaCmd = &cobra.Command{
 		scribeDir := getOutputPath("scribe")
 		pressDir := getOutputPath("press")
 
-		os.MkdirAll(audioDir, 0755)
-		os.MkdirAll(scribeDir, 0755)
-		os.MkdirAll(pressDir, 0755)
+		_ = os.MkdirAll(audioDir, 0755)
+		_ = os.MkdirAll(scribeDir, 0755)
+		_ = os.MkdirAll(pressDir, 0755)
 
 		// --- PHASE 1: LISTEN ---
 		now := time.Now()
@@ -36,28 +36,32 @@ var scriptaCmd = &cobra.Command{
 
 		fmt.Println("✅ Listening... Press Enter to end the verbal registration.")
 		var input string
-		fmt.Scanln(&input)
-		audioRecorder.Stop()
+		_, _ = fmt.Scanln(&input)
+		_ = audioRecorder.Stop()
 		fmt.Println("🛑 Verbal registration finished.")
 
 		// --- PHASE 2: RENAME (TITLING) ---
 		fmt.Print("📝 Title for this Scripta (e.g., Daily-Sync) or Enter for default: ")
 		var title string
-		fmt.Scanln(&title)
+		_, _ = fmt.Scanln(&title)
 
 		finalPath := tempPath
 		if title != "" {
 			cleanName := strings.ReplaceAll(title, " ", "-")
 			newName := fmt.Sprintf("%s-%s.wav", dateStr, cleanName)
 			finalPath = filepath.Join(audioDir, newName)
-			os.Rename(tempPath, finalPath)
-			fmt.Printf("📂 Official file: %s\n", newName)
+			if err := os.Rename(tempPath, finalPath); err != nil {
+				fmt.Printf("⚠️ Error renaming file: %v\n", err)
+				finalPath = tempPath // Fallback
+			} else {
+				fmt.Printf("📂 Official file: %s\n", newName)
+			}
 		}
 
 		// --- PHASE 3: SCRIBE (WRITING) ---
 		fmt.Print("💡 Do you want Guto Scribe to write this registration now? (y/n): ")
 		var confirmScribe string
-		fmt.Scanln(&confirmScribe)
+		_, _ = fmt.Scanln(&confirmScribe)
 
 		if confirmScribe == "y" || confirmScribe == "Y" {
 			txtPath, err := scribeAdapter.Transcribe(finalPath)
@@ -75,16 +79,19 @@ var scriptaCmd = &cobra.Command{
 
 			fmt.Print("🗑️  Do you want to discard the audio master (.wav)? (y/n): ")
 			var confirmClean string
-			fmt.Scanln(&confirmClean)
+			_, _ = fmt.Scanln(&confirmClean)
 			if confirmClean == "y" || confirmClean == "Y" {
-				os.Remove(finalPath)
-				fmt.Println("✅ Master discarded. Space recovered.")
+				if err := os.Remove(finalPath); err != nil {
+					fmt.Printf("⚠️ Error removing file: %v\n", err)
+				} else {
+					fmt.Println("✅ Master discarded. Space recovered.")
+				}
 			}
 
 			// --- PHASE 4: PRESS (PRESSING) ---
 			fmt.Print("🤖 Guto Press: Generate executive summary in Markdown? (y/n): ")
 			var confirmPress string
-			fmt.Scanln(&confirmPress)
+			_, _ = fmt.Scanln(&confirmPress)
 			if confirmPress == "y" || confirmPress == "Y" {
 				content, err := os.ReadFile(txtPath)
 				if err != nil {

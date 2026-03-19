@@ -35,7 +35,7 @@ var listenCmd = &cobra.Command{
 
 		fmt.Fprintln(cmd.OutOrStdout(), "✅ Recording. Press Enter to stop...")
 		var input string
-		fmt.Fscanln(cmd.InOrStdin(), &input)
+		_, _ = fmt.Fscanln(cmd.InOrStdin(), &input)
 
 		if err := audioRecorder.Stop(); err != nil {
 			fmt.Fprintf(cmd.OutOrStdout(), "⚠️ Error stopping recording: %v\n", err)

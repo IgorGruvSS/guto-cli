@@ -28,7 +28,10 @@ var scribeCmd = &cobra.Command{
 		}
 
 		scribeDir := getOutputPath("scribe")
-		os.MkdirAll(scribeDir, 0755)
+		if err := os.MkdirAll(scribeDir, 0755); err != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "❌ Error creating directory: %v\n", err)
+			return
+		}
 		newTxtPath := filepath.Join(scribeDir, filepath.Base(txtPath))
 		if err := os.Rename(txtPath, newTxtPath); err == nil {
 			txtPath = newTxtPath
@@ -38,7 +41,7 @@ var scribeCmd = &cobra.Command{
 
 		fmt.Fprint(cmd.OutOrStdout(), "🗑️  Do you want to discard the original audio master? (y/n): ")
 		var confirm string
-		fmt.Fscanln(cmd.InOrStdin(), &confirm)
+		_, _ = fmt.Fscanln(cmd.InOrStdin(), &confirm)
 
 		if confirm == "y" || confirm == "Y" {
 			if err := os.Remove(inputPath); err != nil {

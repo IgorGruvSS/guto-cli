@@ -64,7 +64,7 @@ func (a *FFmpegAdapter) Stop() error {
 		case err := <-done:
 			return err
 		case <-time.After(2 * time.Second):
-			a.Cmd.Process.Kill()
+			_ = a.Cmd.Process.Kill()
 			return fmt.Errorf("ffmpeg did not exit in time and was forced to stop")
 		}
 	}

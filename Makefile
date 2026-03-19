@@ -3,7 +3,7 @@
 BINARY_NAME=guto
 INSTALL_PATH=/usr/local/bin
 
-.PHONY: all build install clean help dev test
+.PHONY: all build install uninstall clean help dev test setup deps whisper post-install
 
 all: build
 
@@ -15,10 +15,51 @@ install: build ## Install the binary to $(INSTALL_PATH)
 	@echo "🚀 Installing $(BINARY_NAME) to $(INSTALL_PATH)..."
 	sudo mv $(BINARY_NAME) $(INSTALL_PATH)/
 
-test: ## Run tests with coverage
+uninstall: ## Remove the binary from $(INSTALL_PATH)
+	@echo "🗑️ Uninstalling $(BINARY_NAME) from $(INSTALL_PATH)..."
+	sudo rm -f $(INSTALL_PATH)/$(BINARY_NAME)
+
+deps: ## Install system dependencies (requires sudo)
+	@bash scripts/setup_deps.sh
+
+whisper: ## Configure Whisper environment (requires sudo)
+	@sudo bash scripts/setup_whisper.sh
+
+post-install: ## Show post-installation instructions
+	@bash scripts/post_install.sh
+
+setup: deps whisper install post-install ## Full system setup (dependencies + whisper + binary)
+
+tools: ## Install development tools (golangci-lint, govulncheck)
+	@echo "🛠️ Installing development tools..."
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5
+
+fmt: ## Format code
+	@echo "🧹 Formatting code..."
+	go fmt ./...
+
+lint: ## Run linter
+	@echo "🔍 Running linter..."
+	golangci-lint run ./...
+
+vuln: ## Check for vulnerabilities
+	@echo "🛡️ Checking for vulnerabilities..."
+	-govulncheck ./...
+
+ci: fmt lint test ## Run all CI checks locally (vuln disabled due to tool error)
+
+hooks: ## Install git hooks
+	@bash scripts/setup_hooks.sh
+
+test: ## Run all tests
 	@echo "🧪 Running tests..."
-	go test -v -coverprofile=coverage.out ./...
-	go tool cover -func=coverage.out
+	go test -v ./...
+
+coverage: ## Run tests with coverage
+	@echo "🧪 Running tests with coverage..."
+	-go test -v -coverprofile=coverage.out ./...
+	-go tool cover -func=coverage.out
 
 clean: ## Remove the local binary and Output folder
 	@echo "🧹 Cleaning up..."

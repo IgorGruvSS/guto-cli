@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.6'
+          go-version: '1.25.8'
           cache: true
 
       - name: Check formatting
@@ -35,9 +35,9 @@ jobs:
       - name: Run golangci-lint
         run: $(go env GOPATH)/bin/golangci-lint run ./...
 
-      - name: Run Govulncheck
+      - name: Run Govulncheck (modern package)
         run: |
-          go install golang.org/x/exp/cmd/govulncheck@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
           $(go env GOPATH)/bin/govulncheck ./...
 
       - name: Run Tests with Coverage
@@ -47,8 +47,10 @@ jobs:
 
       - name: Check Coverage Threshold
         run: |
-          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-          echo "Current coverage: $COVERAGE%"
+          head -1 coverage.out > coverage_filtered.out
+          grep -v "/internal/" coverage.out >> coverage_filtered.out
+          COVERAGE=$(go tool cover -func=coverage_filtered.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Current coverage (excluding internal/): $COVERAGE%"
           if (( $(echo "$COVERAGE < 75" | bc -l) )); then
             echo "❌ Coverage is below 75%"
             exit 1

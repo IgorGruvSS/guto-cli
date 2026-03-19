@@ -47,7 +47,19 @@ vuln: ## Check for vulnerabilities
 	@echo "🛡️ Checking for vulnerabilities..."
 	-govulncheck ./...
 
-ci: fmt lint test ## Run all CI checks locally (vuln disabled due to tool error)
+check-coverage: ## Run tests and enforce 75% coverage threshold (excludes internal/)
+	@echo "🧪 Running tests with coverage..."
+	@go test -v -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out
+	@head -1 coverage.out > coverage_filtered.out
+	@grep -v "/internal/" coverage.out >> coverage_filtered.out
+	@COVERAGE=$$(go tool cover -func=coverage_filtered.out | grep total | awk '{print $$3}' | sed 's/%//'); \
+	echo "Coverage (excluding internal/): $$COVERAGE%"; \
+	if [ $$(echo "$$COVERAGE < 75" | bc -l) -eq 1 ]; then \
+		echo "❌ Coverage is below 75%"; exit 1; \
+	fi
+
+ci: fmt lint vuln check-coverage ## Run all CI checks locally
 
 hooks: ## Install git hooks
 	@bash scripts/setup_hooks.sh

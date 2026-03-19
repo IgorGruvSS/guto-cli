@@ -29,10 +29,11 @@ jobs:
             exit 1
           fi
 
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5
+
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.64.5
+        run: $(go env GOPATH)/bin/golangci-lint run ./...
 
       - name: Run Govulncheck
         run: |

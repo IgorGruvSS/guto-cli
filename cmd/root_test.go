@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -44,4 +45,34 @@ func TestGetOutputPath(t *testing.T) {
 	}
 	// Reset viper for other tests
 	viper.Set("output.base_dir", "")
+}
+
+func TestInitConfig_WithCfgFile(t *testing.T) {
+	tmp, err := os.CreateTemp("", "guto-config-*.yaml")
+	assert.NoError(t, err)
+	tmp.Close()
+	defer os.Remove(tmp.Name())
+
+	old := cfgFile
+	cfgFile = tmp.Name()
+	defer func() {
+		cfgFile = old
+		viper.Reset()
+	}()
+
+	initConfig()
+	assert.Equal(t, tmp.Name(), viper.ConfigFileUsed())
+}
+
+func TestInitConfig_DefaultPath(t *testing.T) {
+	viper.Reset()
+	old := cfgFile
+	cfgFile = ""
+	defer func() {
+		cfgFile = old
+		viper.Reset()
+	}()
+
+	// Should not panic even if ~/.config/guto/config.yaml doesn't exist.
+	initConfig()
 }

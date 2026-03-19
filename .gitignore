@@ -1,3 +1,2 @@
 Output
-coverage.out
-coverage_filtered.out
+*.out

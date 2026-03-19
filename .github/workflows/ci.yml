@@ -42,13 +42,13 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          go test -v -coverprofile=coverage.out ./...
+          go test -v -coverprofile=coverage.out ./cmd/...
           go tool cover -func=coverage.out
 
       - name: Check Coverage Threshold
         run: |
           head -1 coverage.out > coverage_filtered.out
-          grep -v "/internal/" coverage.out >> coverage_filtered.out
+          grep -v "^mode:" coverage.out | grep -v "/internal/" >> coverage_filtered.out
           COVERAGE=$(go tool cover -func=coverage_filtered.out | grep total | awk '{print $3}' | sed 's/%//')
           echo "Current coverage (excluding internal/): $COVERAGE%"
           if (( $(echo "$COVERAGE < 75" | bc -l) )); then

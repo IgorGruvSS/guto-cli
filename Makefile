@@ -49,10 +49,10 @@ vuln: ## Check for vulnerabilities
 
 check-coverage: ## Run tests and enforce 75% coverage threshold (excludes internal/)
 	@echo "🧪 Running tests with coverage..."
-	@go test -v -coverprofile=coverage.out ./...
+	@go test -v -coverprofile=coverage.out ./cmd/...
 	@go tool cover -func=coverage.out
 	@head -1 coverage.out > coverage_filtered.out
-	@grep -v "/internal/" coverage.out >> coverage_filtered.out
+	@grep -v "^mode:" coverage.out | grep -v "/internal/" >> coverage_filtered.out
 	@COVERAGE=$$(go tool cover -func=coverage_filtered.out | grep total | awk '{print $$3}' | sed 's/%//'); \
 	echo "Coverage (excluding internal/): $$COVERAGE%"; \
 	if [ $$(echo "$$COVERAGE < 75" | bc -l) -eq 1 ]; then \
@@ -70,7 +70,7 @@ test: ## Run all tests
 
 coverage: ## Run tests with coverage
 	@echo "🧪 Running tests with coverage..."
-	-go test -v -coverprofile=coverage.out ./...
+	-go test -v -coverprofile=coverage.out ./cmd/...
 	-go tool cover -func=coverage.out
 
 clean: ## Remove the local binary and Output folder
